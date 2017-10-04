@@ -1,25 +1,18 @@
-require 'pry'
 require './lib/chisel'
-require 'minitest/autorun'
-require 'minitest/pride'
+require  './test/test_helper'
 
 class ChiselTest < Minitest::Test
+  def setup
+    @chisel = Chisel.new
+  end
+
   def test_it_exists
-    chisel = Chisel.new
-
-    assert_instance_of Chisel, chisel
+    assert_instance_of Chisel, @chisel
   end
 
-  def test_that_one_line_can_be_converted
-    chisel = Chisel.new
-
-    assert_equal "<h1> My life in Desserts</h1>", chisel.convert_single_line("# My life in Desserts")
-  end
-
-  def test_that_argv_works
-    chisel = Chisel.new
-
-    assert_equal "# My Life in Desserts\n", chisel.input_data.first
+  def test_case_name
+    assert_equal "my_input.md", @chisel.file_in
+    assert_equal "my_output.html", @chisel.file_out
   end
 
 end
