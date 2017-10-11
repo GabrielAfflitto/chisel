@@ -79,6 +79,8 @@ class MarkdownConverter
   end
 
   def unordered_list_format
+    # tried refactoring with single line if statement, would
+    # not return the same output
     front_format = unordered_list_select.unshift("<ul>\n")
     back_format = front_format.push("</ul>\n")
     b = back_format.map do |item|
