@@ -38,12 +38,20 @@ class MarkdownConverterTest < Minitest::Test
     assert_equal ["<p>", "My", "<em>emphasized", "and", "<strong>stronged</strong>", "text</em>", "is", "awesome.", "</p>"], converter.emphasis_convert
   end
 
-  def test_that_list_select_returns_the_items_in_list
-    assert_equal ["* Sushi", "* Barbeque", "* Mexican"], converter.list_select_asterisk
+  def test_that_list_select_returns_the_items_in_list_with_asterisks
+    assert_equal ["* Sushi", "* Barbeque", "* Mexican"], converter.unordered_list_select
   end
 
-  def test_list_format_changes_the_list_to_some_shit
-    assert_equal ["<ol>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ol>\n"], converter.list_format
+  def test_list_format_converts_list_to_proper_format
+    assert_equal ["<ul>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ul>\n"], converter.unordered_list_format
+  end
+
+  def test_list_select_returns_all_items_in_list_with_numbers
+    assert_equal ["1. Sushi", "2. Barbeque", "3. Mexican"], converter.ordered_list_select
+  end
+
+  def test_unordered_list_format_converts_numbered_list_to_proper_format
+    assert_equal ["<ol>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ol>\n"], converter.ordered_list_format
   end
 
 end

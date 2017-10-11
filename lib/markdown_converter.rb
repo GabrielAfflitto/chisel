@@ -1,6 +1,5 @@
 require 'pry'
 
-
 class MarkdownConverter
 
   attr_reader :file_in, :file_out
@@ -37,8 +36,8 @@ class MarkdownConverter
   end
 
   def paragraph_converter
-    input_data.map do |str|
-      if str.empty? == false && !str.start_with?("#") && str[1] != " "
+    b = input_data.map do |str|
+      if str.empty? == false && !str.start_with?("#") && str[1] != " " && str[1] != "."
         "<p>\n" + str + "\n</p>"
       else
         str
@@ -61,11 +60,12 @@ class MarkdownConverter
 
   def emphasis_convert
     # second method
-    strong_convert.map do |word|
+    g = strong_convert.map do |word|
       word[0] = "<em>" if word.start_with?("*")
       word[-1] = "</em>" if word.end_with?("*")
       word
     end
+    # binding.pry
   end
 
   def format_converter_split
@@ -74,13 +74,13 @@ class MarkdownConverter
     b = paragraph_converter.select {|str| str if str.include?("*") && str[1] != " "}.join.split
   end
 
-  def list_select_asterisk
+  def unordered_list_select
     paragraph_converter.select {|str| str if str.include?("*") && str[1] == " "}
   end
 
-  def list_format
-    front_format = list_select_asterisk.unshift("<ol>\n")
-    back_format = front_format.push("</ol>\n")
+  def unordered_list_format
+    front_format = unordered_list_select.unshift("<ul>\n")
+    back_format = front_format.push("</ul>\n")
     b = back_format.map do |item|
       if item.start_with?("*")
         "<li>" + item.delete("* ") + "</li>\n"
@@ -88,7 +88,20 @@ class MarkdownConverter
         item
       end
     end
-    binding.pry
+  end
+
+  def ordered_list_select
+    g = paragraph_converter.select {|str| str if str[1] == "."}
+  end
+
+  def ordered_list_format
+    front_format = ordered_list_select.unshift("<ol>\n")
+    back_format = front_format.push("</ol>\n")
+    b = back_format.map do |item|
+      item[0..2] = "<li>" if item[1] == "."
+      item << "</li>\n" if item.start_with?("<li>")
+      item
+    end
   end
 
 end
