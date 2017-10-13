@@ -1,3 +1,3 @@
-require './lib/file_parser'
+require './lib/markdown_converter'
 
-FileParser.new(ARGV[0], ARGV[1])
+MarkdownConverter.new(ARGV[0], ARGV[1])
