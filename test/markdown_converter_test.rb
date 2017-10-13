@@ -58,9 +58,4 @@ class MarkdownConverterTest < Minitest::Test
   #   assert_equal ["<ol>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ol>\n"], converter.ordered_list_format
   # end
 
-  def test_convert_to_html
-    skip
-    assert_equal [], converter.convert_to_html
-  end
-
 end
