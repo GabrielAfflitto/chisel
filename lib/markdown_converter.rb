@@ -23,13 +23,12 @@ class MarkdownConverter
   end
 
   def paragraph_converter
+    # might need to be changed back to multi line if/else statement
     convert_header.map do |str|
-      if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
-        "<p>\n" + str + "\n</p>"
-      else
-        str
-      end
+      "<p>\n" + str + "\n</p>" if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
+      str
     end
+    # binding.pry
   end
 
   def format_converter
@@ -91,18 +90,6 @@ class MarkdownConverter
     end.uniq
   end
 
-  def unordered_list_format
-    unordered_list_select.map do |element|
-      if element.is_a?(Array)
-        list_tags = element.map {|str| "<li>" + str.delete("* ") + "</li>\n"}
-        list_tags.unshift("<ul>\n")
-        list_tags.push("</ul>\n")
-      else
-        element
-      end
-    end.flatten
-  end
-
   def ordered_list_select
     ordered_units = paragraph_converter.select {|str| str if str[1] == "."}
     unordered_list_format.map do |str|
@@ -114,18 +101,41 @@ class MarkdownConverter
     end.uniq
   end
 
+  def unordered_list_format
+    unordered_list_select.map do |element|
+      if element.is_a?(Array)
+        list_tags = element.map {|str| "<li>" + str.delete("* ") + "</li>"}
+        list_tags.unshift("<ul>")
+        list_tags.push("</ul>")
+      else
+        element
+      end
+    end.flatten
+  end
+
   def ordered_list_format
     ordered_list_select.map do |element|
       if element.is_a?(Array)
         list_tags = element.map do |str|
           str[0..2] = "<li>" if str[1] == "."
-          str << "</li>\n" if str.start_with?("<li>")
+          str << "</li>" if str.start_with?("<li>")
         end
-        list_tags.unshift("<ol>\n")
-        list_tags.push("</ol>\n")
+        list_tags.unshift("<ol>")
+        list_tags.push("</ol>")
       else
         element
       end
     end.flatten
+  end
+
+  def new_line_format_for_file
+    space_remove = ordered_list_format - [""]
+    new_line_format = space_remove.map do |line|
+      if !line.end_with?("</li>") && !line.include?("<ul>") && !line.include?("<ol>")
+        line + "\n\n"
+      else
+        line + "\n"
+      end
+    end.join
   end
 end

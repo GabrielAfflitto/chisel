@@ -46,16 +46,19 @@ class MarkdownConverterTest < Minitest::Test
     assert_equal ["* Sushi", "* Barbeque", "* Mexican"], converter.unordered_list_select[6]
   end
 
-  # def test_list_format_converts_list_to_proper_format
-  #   assert_equal ["<ul>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ul>\n"], converter.unordered_list_format
-  # end
-  #
-  # def test_list_select_returns_all_items_in_list_with_numbers
-  #   assert_equal ["1. Sushi", "2. Barbeque", "3. Mexican"], converter.ordered_list_select[7]
-  # end
-  #
-  # def test_ordered_list_format_converts_numbered_list_to_proper_format
-  #   assert_equal ["<ol>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ol>\n"], converter.ordered_list_format
-  # end
+  def test_list_format_converts_list_to_proper_format
+    skip
+    assert_equal ["<ul>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ul>\n"], converter.unordered_list_format
+  end
+
+  def test_list_select_returns_all_items_in_list_with_numbers
+    skip
+    assert_equal ["1. Sushi", "2. Barbeque", "3. Mexican"], converter.ordered_list_select
+  end
+
+  def test_ordered_list_format_converts_numbered_list_to_proper_format
+    skip
+    assert_equal ["<ol>\n", "<li>Sushi</li>\n", "<li>Barbeque</li>\n", "<li>Mexican</li>\n", "</ol>\n"], converter.ordered_list_format
+  end
 
 end
