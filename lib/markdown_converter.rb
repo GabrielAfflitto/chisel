@@ -90,20 +90,6 @@ class MarkdownConverter
     end
   end
 
-  def strong_convert
-    format_converter_split.map do |element|
-      if element.is_a?(Array)
-        element.map do |word|
-          word[0..1] = "<strong>" if word.start_with?("**")
-          word[-2..-1] = "</strong>" if word.end_with?("**")
-          word
-        end
-      else
-        element
-      end
-    end
-  end
-
   def emphasis_convert
     strong_convert.map do |element|
       if element.is_a?(Array)
@@ -117,7 +103,43 @@ class MarkdownConverter
       end
     end
   end
+ #-------------------------------------------------
+  def strong_tags(word)
+    word[0..1] = "<strong>" if word.start_with?("**")
+    word[-2..-1] = "</strong>" if word.end_with?("**")
+    word
+  end
 
+  def strong_format(element)
+    if element.is_a?(Array)
+      element.map do |word|
+        strong_tags(word)
+      end
+    else
+      element
+    end
+  end
+
+  def strong_convert
+    format_converter_split.map do |element|
+      strong_format(element)
+    end
+  end
+
+  # def strong_convert
+  #   format_converter_split.map do |element|
+  #     if element.is_a?(Array)
+  #       element.map do |word|
+  #         word[0..1] = "<strong>" if word.start_with?("**")
+  #         word[-2..-1] = "</strong>" if word.end_with?("**")
+  #         word
+  #       end
+  #     else
+  #       element
+  #     end
+  #   end
+  # end
+ #-------------------------------------------
   def split_format(str)
     if str.count("*") > 1
       str.split

@@ -36,12 +36,10 @@ class MarkdownConverterTest < Minitest::Test
   end
 
   def test_that_strong_converter_can_convert_double_asterisks
-    skip
     assert_equal ["<p>", "My", "*emphasized", "and", "<strong>stronged</strong>", "text*", "is", "awesome.", "</p>"], converter.strong_convert[6]
   end
 
   def test_that_emphasis_converter_can_convert_single_asterisks
-    skip
     assert_equal ["<p>", "My", "<em>emphasized", "and", "<strong>stronged</strong>", "text</em>", "is", "awesome.", "</p>"], converter.emphasis_convert[6]
   end
 

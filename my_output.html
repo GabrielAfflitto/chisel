@@ -52,3 +52,27 @@ def format_converter_split
     split_format(str)
   end
 end
+
+<!-- --------- -->
+
+def strong_array(word)
+  element.map do |word|
+    word[0..1] = "<strong>" if word.start_with?("**")
+    word[-2..-1] = "</strong>" if word.end_with?("**")
+    word
+  end
+end
+
+def strong_format(element)
+  if element.is_a?(Array)
+    strong_array(word)
+  else
+    element
+  end
+end
+
+def strong_convert
+  format_converter_split.map do |element|
+    strong_format(element)
+  end
+end
