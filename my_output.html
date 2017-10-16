@@ -1,26 +1,24 @@
-<h1> My Life in Desserts </h1>
 
-<h2> Chapter 1: The Beginning </h2>
+def input_data
+  lines = File.readlines(file_in)
+  lines.map { |line| line.chomp }
+end
 
-<p>
-Hello, World.
-</p>
+def format_headers(str)
+  hash_count = str.count "#"
+  "<h#{hash_count}>" + str.delete("#") + " </h#{hash_count}>"
+end
 
-<p> My <em>emphasized and <strong>stronged</strong> text</em> is awesome. </p>
+def find_headers(str)
+  if str.start_with?("#")
+    format_headers(str)
+  else
+    str
+  end
+end
 
-<p>
-My favorite cuisines are:
-</p>
-
-<ul>
-<li>Sushi</li>
-<li>Barbeque</li>
-<li>Mexican</li>
-</ul>
-
-<ol>
-<li>Sushi</li>
-<li>Barbeque</li>
-<li>Mexican</li>
-</ol>
-
+def convert_header
+  input_data.map do |str|
+    find_headers(str)
+  end
+end

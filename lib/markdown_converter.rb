@@ -23,12 +23,13 @@ class MarkdownConverter
   end
 
   def paragraph_converter
-    # might need to be changed back to multi line if/else statement
     convert_header.map do |str|
-      "<p>\n" + str + "\n</p>" if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
-      str
+      if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
+        "<p>\n" + str + "\n</p>"
+      else
+        str
+      end
     end
-    # binding.pry
   end
 
   def format_converter
@@ -91,9 +92,9 @@ class MarkdownConverter
   end
 
   def ordered_list_select
-    ordered_units = paragraph_converter.select {|str| str if str[1] == "."}
+    ordered_units = paragraph_converter.select {|str| str if check_for_ordered_list_item(str)}
     unordered_list_format.map do |str|
-      if str[1] == "."
+      if check_for_ordered_list_item(str)
         ordered_units
       else
         str
@@ -105,8 +106,7 @@ class MarkdownConverter
     unordered_list_select.map do |element|
       if element.is_a?(Array)
         list_tags = element.map {|str| "<li>" + str.delete("* ") + "</li>"}
-        list_tags.unshift("<ul>")
-        list_tags.push("</ul>")
+        list_push("<ul>", "</ul>", list_tags)
       else
         element
       end
@@ -117,11 +117,10 @@ class MarkdownConverter
     ordered_list_select.map do |element|
       if element.is_a?(Array)
         list_tags = element.map do |str|
-          str[0..2] = "<li>" if str[1] == "."
-          str << "</li>" if str.start_with?("<li>")
+          str[0..2] = "<li>" if check_for_ordered_list_item(str)
+          str << "</li>"
         end
-        list_tags.unshift("<ol>")
-        list_tags.push("</ol>")
+        list_push("<ol>", "</ol>", list_tags)
       else
         element
       end
@@ -138,4 +137,14 @@ class MarkdownConverter
       end
     end.join
   end
+
+  def list_push(open_tag, close_tag, list_tags)
+    list_tags.unshift(open_tag)
+    list_tags.push(close_tag)
+  end
+
+  def check_for_ordered_list_item(str)
+    str[1] == "."
+  end
+
 end
