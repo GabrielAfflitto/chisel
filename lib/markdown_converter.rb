@@ -11,27 +11,75 @@ class MarkdownConverter
     lines.map { |line| line.chomp }
   end
 
+  # def convert_header
+  #   input_data.map do |str|
+  #     if str.start_with?("#")
+  #       hash_count = str.count "#"
+  #       "<h#{hash_count}>" + str.delete("#") + " </h#{hash_count}>"
+  #     else
+  #       str
+  #     end
+  #   end
+  # end
+ # --------------
+  def format_headers(str)
+    hash_count = str.count "#"
+    "<h#{hash_count}>" + str.delete("#") + " </h#{hash_count}>"
+  end
+
+  def find_headers(str)
+    if str.start_with?("#")
+      format_headers(str)
+    else
+      str
+    end
+  end
+
   def convert_header
     input_data.map do |str|
-      if str.start_with?("#")
-        hash_count = str.count "#"
-        "<h#{hash_count}>" + str.delete("#") + " </h#{hash_count}>"
-      else
-        str
-      end
+      find_headers(str)
+    end
+  end
+ # ----------------------
+  def is_header?(str)
+    str.start_with?("<h")
+  end
+
+  def is_unordered_list?(str)
+    str[1] == " "
+  end
+
+  def is_ordered_list?(str)
+    str[1] == "."
+  end
+
+  def is_paragraph?(str)
+    true if !str.empty? or !is_header?(str) or !is_unordered_list?(str) or !is_ordered_list?(str)
+  end
+
+  def format_paragraph(str)
+    if is_paragraph?(str)
+      "<p>\n" + str + "\n</p>"
+    else
+      str
     end
   end
 
   def paragraph_converter
     convert_header.map do |str|
-      if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
-        "<p>\n" + str + "\n</p>"
-      else
-        str
-      end
+      format_paragraph(str)
     end
   end
-
+  # def paragraph_converter
+  #   convert_header.map do |str|
+  #     if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
+  #       "<p>\n" + str + "\n</p>"
+  #     else
+  #       str
+  #     end
+  #   end
+  # end
+  #--------------------------
   def format_converter
     emphasis_convert.map do |element|
       if element.is_a?(Array)
@@ -70,16 +118,30 @@ class MarkdownConverter
     end
   end
 
-  def format_converter_split
-    paragraph_converter.map do |str|
-      if str.include?("*") && str.count("*") > 1
-        str.split
-      else
-        str
-      end
+  def split_format(str)
+    if str.count("*") > 1
+      str.split
+    else
+      str
     end
   end
 
+  def format_converter_split
+    paragraph_converter.map do |str|
+      split_format(str)
+    end
+  end
+
+  # def format_converter_split
+  #   paragraph_converter.map do |str|
+  #     if str.include?("*") && str.count("*") > 1
+  #       str.split
+  #     else
+  #       str
+  #     end
+  #   end
+  # end
+ #--------------------------------------
   def unordered_list_select
     unordered_units = paragraph_converter.select {|str| str if str.include?("*") && str[1] == " "}
     format_converter.map do |str|
@@ -92,9 +154,9 @@ class MarkdownConverter
   end
 
   def ordered_list_select
-    ordered_units = paragraph_converter.select {|str| str if check_for_ordered_list_item(str)}
+    ordered_units = paragraph_converter.select {|str| str if str[1] == "."}
     unordered_list_format.map do |str|
-      if check_for_ordered_list_item(str)
+      if str[1] == "."
         ordered_units
       else
         str
@@ -117,7 +179,7 @@ class MarkdownConverter
     ordered_list_select.map do |element|
       if element.is_a?(Array)
         list_tags = element.map do |str|
-          str[0..2] = "<li>" if check_for_ordered_list_item(str)
+          str[0..2] = "<li>" if str[1] == "."
           str << "</li>"
         end
         list_push("<ol>", "</ol>", list_tags)
@@ -141,10 +203,6 @@ class MarkdownConverter
   def list_push(open_tag, close_tag, list_tags)
     list_tags.unshift(open_tag)
     list_tags.push(close_tag)
-  end
-
-  def check_for_ordered_list_item(str)
-    str[1] == "."
   end
 
 end

@@ -31,18 +31,22 @@ class MarkdownConverterTest < Minitest::Test
   end
 
   def test_that_format_converter_can_convert_emphasized_and_strong_text
+    skip
     assert_equal "<p> My <em>emphasized and <strong>stronged</strong> text</em> is awesome. </p>", converter.format_converter[6]
   end
 
   def test_that_strong_converter_can_convert_double_asterisks
+    skip
     assert_equal ["<p>", "My", "*emphasized", "and", "<strong>stronged</strong>", "text*", "is", "awesome.", "</p>"], converter.strong_convert[6]
   end
 
   def test_that_emphasis_converter_can_convert_single_asterisks
+    skip
     assert_equal ["<p>", "My", "<em>emphasized", "and", "<strong>stronged</strong>", "text</em>", "is", "awesome.", "</p>"], converter.emphasis_convert[6]
   end
 
   def test_that_list_select_returns_the_items_in_list_with_asterisks
+    skip
     assert_equal ["* Sushi", "* Barbeque", "* Mexican"], converter.unordered_list_select[6]
   end
 
