@@ -1,5 +1,6 @@
 require 'pry'
-class MarkdownConverter
+require './lib/markdown_converter_helper'
+class MarkdownConverter < MarkdownConverterHelper
   attr_reader :file_in, :file_out
   def initialize(markdown, html)
     @file_in = markdown
@@ -22,18 +23,18 @@ class MarkdownConverter
   #   end
   # end
  # --------------
-  def format_headers(str)
-    hash_count = str.count "#"
-    "<h#{hash_count}>" + str.delete("#") + " </h#{hash_count}>"
-  end
-
-  def find_headers(str)
-    if str.start_with?("#")
-      format_headers(str)
-    else
-      str
-    end
-  end
+  # def format_headers(str)
+  #   hash_count = str.count "#"
+  #   "<h#{hash_count}>" + str.delete("#") + " </h#{hash_count}>"
+  # end
+  #
+  # def find_headers(str)
+  #   if str.start_with?("#")
+  #     format_headers(str)
+  #   else
+  #     str
+  #   end
+  # end
 
   def convert_header
     input_data.map do |str|
@@ -294,16 +295,33 @@ class MarkdownConverter
 
 # ----------------------------
 
-  def new_line_format_for_file
-    space_remove = ordered_list_format - [""]
-    new_line_format = space_remove.map do |line|
-      if !line.end_with?("</li>") && !line.include?("<ul>") && !line.include?("<ol>")
-        line + "\n\n"
-      else
-        line + "\n"
-      end
-    end.join
+def new_line_define(line)
+  if !line.end_with?("</li>") && !line.include?("<ul>") && !line.include?("<ol>")
+    line + "\n\n"
+  else
+    line + "\n"
   end
+end
+
+def new_line_format_for_final_output
+  space_remove = ordered_list_format - [""]
+  new_line_format = space_remove.map do |line|
+    new_line_define(line)
+  end.join
+end
+
+
+  # def new_line_format_for_file
+  #   space_remove = ordered_list_format - [""]
+  #   new_line_format = space_remove.map do |line|
+  #     if !line.end_with?("</li>") && !line.include?("<ul>") && !line.include?("<ol>")
+  #       line + "\n\n"
+  #     else
+  #       line + "\n"
+  #     end
+  #   end.join
+  # end
+  # -------------------------------
 
   def list_push(open_tag, close_tag, list_tags)
     list_tags.unshift(open_tag)

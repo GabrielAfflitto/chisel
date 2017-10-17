@@ -173,3 +173,20 @@ def ordered_list_format
     ordered_list_tags(element)
   end.flatten
 end
+# ----------------------------
+
+def new_line_define(line)
+  if !line.end_with?("</li>") && !line.include?("<ul>") && !line.include?("<ol>")
+    line + "\n\n"
+  else
+    line + "\n"
+  end
+end
+
+
+def new_line_format_for_file
+  space_remove = ordered_list_format - [""]
+  new_line_format = space_remove.map do |line|
+    new_line_define(line)
+  end.join
+end
