@@ -2,7 +2,7 @@ require 'pry'
 require './lib/markdown_converter_helper'
 class MarkdownConverter
   include MarkdownConverterHelper
-  
+
   attr_reader :file_in, :file_out
   def initialize(markdown, html)
     @file_in = markdown
