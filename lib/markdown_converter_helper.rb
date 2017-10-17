@@ -16,7 +16,7 @@ module MarkdownConverterHelper
 
   def format_paragraph(str)
     if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
-      "<p>\n" + str + "\n</p>"
+      "<p>\n" + str.gsub("&", "&amp;") + "\n</p>"
     else
       str
     end
