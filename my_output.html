@@ -1,78 +1,26 @@
+<h1> My Life in Desserts </h1>
 
-def input_data
-  lines = File.readlines(file_in)
-  lines.map { |line| line.chomp }
-end
+<h2> Chapter 1: The Beginning </h2>
 
-def format_headers(str)
-  hash_count = str.count "#"
-  "<h#{hash_count}>" + str.delete("#") + " </h#{hash_count}>"
-end
+<p>
+Hello, World.
+</p>
 
-def find_headers(str)
-  if str.start_with?("#")
-    format_headers(str)
-  else
-    str
-  end
-end
+<p> My <em>emphasized and <strong>stronged</strong> text</em> is awesome. </p>
 
-def convert_header
-  input_data.map do |str|
-    find_headers(str)
-  end
-end
+<p>
+My favorite cuisines are:
+</p>
 
-def is_header?(str)
-  str.start_with?("<h")
-end
+<ul>
+<li>Sushi</li>
+<li>Barbeque</li>
+<li>Mexican</li>
+</ul>
 
-def is_unordered_list?(str)
-  str[1] = " "
-end
+<ol>
+<li>Sushi</li>
+<li>Barbeque</li>
+<li>Mexican</li>
+</ol>
 
-def is_ordered?(str)
-  str[1] = "."
-end
-
-def is_paragraph?(str)
-  false if str.empty? or is_header?(str) or is_unordered_list?(str) or is_ordered_list?(str)
-end
-<!-- ------ -->
-def split_format(str)
-  if str.include?("*") && str.count("*") > 1
-    str.split
-  else
-    str
-  end
-end
-
-def format_converter_split
-  paragraph_converter.map do |str|
-    split_format(str)
-  end
-end
-
-<!-- --------- -->
-
-def strong_array(word)
-  element.map do |word|
-    word[0..1] = "<strong>" if word.start_with?("**")
-    word[-2..-1] = "</strong>" if word.end_with?("**")
-    word
-  end
-end
-
-def strong_format(element)
-  if element.is_a?(Array)
-    strong_array(word)
-  else
-    element
-  end
-end
-
-def strong_convert
-  format_converter_split.map do |element|
-    strong_format(element)
-  end
-end

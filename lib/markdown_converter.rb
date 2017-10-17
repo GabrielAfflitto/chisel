@@ -41,24 +41,9 @@ class MarkdownConverter
     end
   end
  # ----------------------
-  def is_header?(str)
-    str.start_with?("<h")
-  end
-
-  def is_unordered_list?(str)
-    str[1] == " "
-  end
-
-  def is_ordered_list?(str)
-    str[1] == "."
-  end
-
-  def is_paragraph?(str)
-    true if !str.empty? or !is_header?(str) or !is_unordered_list?(str) or !is_ordered_list?(str)
-  end
 
   def format_paragraph(str)
-    if is_paragraph?(str)
+    if !str.empty? && !str.start_with?("<h") && str[1] != " " && str[1] != "."
       "<p>\n" + str + "\n</p>"
     else
       str
@@ -89,20 +74,43 @@ class MarkdownConverter
       end
     end
   end
+ # -------------------------------------------
 
-  def emphasis_convert
-    strong_convert.map do |element|
-      if element.is_a?(Array)
-        element.map do |word|
-          word[0] = "<em>" if word.start_with?("*")
-          word[-1] = "</em>" if word.end_with?("*")
-          word
-        end
-      else
-        element
-      end
-    end
-  end
+ def emphasis_tags(word)
+   word[0] = "<em>" if word.start_with?("*")
+   word[-1] = "</em>" if word.end_with?("*")
+   word
+ end
+
+ def emphasis_format(element)
+   if element.is_a?(Array)
+     element.map do |word|
+       emphasis_tags(word)
+     end
+   else
+     element
+   end
+ end
+
+ def emphasis_convert
+   strong_convert.map do |element|
+     emphasis_format(element)
+   end
+ end
+
+  # def emphasis_convert
+  #   strong_convert.map do |element|
+  #     if element.is_a?(Array)
+  #       element.map do |word|
+  #         word[0] = "<em>" if word.start_with?("*")
+  #         word[-1] = "</em>" if word.end_with?("*")
+  #         word
+  #       end
+  #     else
+  #       element
+  #     end
+  #   end
+  # end
  #-------------------------------------------------
   def strong_tags(word)
     word[0..1] = "<strong>" if word.start_with?("**")
@@ -164,52 +172,127 @@ class MarkdownConverter
   #   end
   # end
  #--------------------------------------
-  def unordered_list_select
-    unordered_units = paragraph_converter.select {|str| str if str.include?("*") && str[1] == " "}
-    format_converter.map do |str|
-      if str.include?("*")
-        unordered_units
-      else
-        str
-      end
-    end.uniq
-  end
 
-  def ordered_list_select
-    ordered_units = paragraph_converter.select {|str| str if str[1] == "."}
-    unordered_list_format.map do |str|
-      if str[1] == "."
-        ordered_units
-      else
-        str
-      end
-    end.uniq
+ def unordered_units
+   paragraph_converter.select {|str| str if str.include?("*") && str[1] == " "}
+ end
+
+ def item_replace(str)
+   if str.include?("*")
+     unordered_units
+   else
+     str
+   end
+ end
+
+ def unordered_list_select
+   format_converter.map do |str|
+     item_replace(str)
+   end
+ end
+
+  # def unordered_list_select
+  #   unordered_units = paragraph_converter.select {|str| str if str.include?("*") && str[1] == " "}
+  #   format_converter.map do |str|
+  #     if str.include?("*")
+  #       unordered_units
+  #     else
+  #       str
+  #     end
+  #   end.uniq
+  # end
+
+  def unordered_list_tags(element)
+    if element.is_a?(Array)
+      list_tags = element.map {|str| "<li>" + str.delete("* ") + "</li>"}
+      list_push("<ul>", "</ul>", list_tags)
+    else
+      element
+    end
   end
 
   def unordered_list_format
     unordered_list_select.map do |element|
-      if element.is_a?(Array)
-        list_tags = element.map {|str| "<li>" + str.delete("* ") + "</li>"}
-        list_push("<ul>", "</ul>", list_tags)
-      else
-        element
-      end
+      unordered_list_tags(element)
     end.flatten
+  end
+
+  # def unordered_list_format
+  #   unordered_list_select.map do |element|
+  #     if element.is_a?(Array)
+  #       list_tags = element.map {|str| "<li>" + str.delete("* ") + "</li>"}
+  #       list_push("<ul>", "</ul>", list_tags)
+  #     else
+  #       element
+  #     end
+  #   end.flatten
+  # end
+# -------------------------
+
+  def ordered_item_replace(str)
+    if str[1] == "."
+      ordered_units
+    else
+      str
+    end
+  end
+
+  def ordered_units
+    paragraph_converter.select {|str| str if str[1] == "."}
+  end
+
+  def ordered_list_select
+    unordered_list_format.map do |str|
+      ordered_item_replace(str)
+    end.uniq
+  end
+
+  # def ordered_list_select
+  #   ordered_units = paragraph_converter.select {|str| str if str[1] == "."}
+  #   unordered_list_format.map do |str|
+  #     if str[1] == "."
+  #       ordered_units
+  #     else
+  #       str
+  #     end
+  #   end.uniq
+  # end
+
+
+
+  def ordered_list_tags(element)
+    if element.is_a?(Array)
+      list_tags = element.map do |str|
+        str[0..2] = "<li>" if str[1] == "."
+        str << "</li>"
+      end
+      list_push("<ol>", "</ol>", list_tags)
+    else
+      element
+    end
   end
 
   def ordered_list_format
     ordered_list_select.map do |element|
-      if element.is_a?(Array)
-        list_tags = element.map do |str|
-          str[0..2] = "<li>" if str[1] == "."
-          str << "</li>"
-        end
-        list_push("<ol>", "</ol>", list_tags)
-      else
-        element
-      end
+      ordered_list_tags(element)
     end.flatten
   end
+
+  # def ordered_list_format
+  #   ordered_list_select.map do |element|
+  #     if element.is_a?(Array)
+  #       list_tags = element.map do |str|
+  #         str[0..2] = "<li>" if str[1] == "."
+  #         str << "</li>"
+  #       end
+  #       list_push("<ol>", "</ol>", list_tags)
+  #     else
+  #       element
+  #     end
+  #   end.flatten
+  # end
+
+# ----------------------------
 
   def new_line_format_for_file
     space_remove = ordered_list_format - [""]
