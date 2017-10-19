@@ -107,6 +107,11 @@ module MarkdownConverterHelper
     end
   end
 
+  def list_push(open_tag, close_tag, list_tags)
+    list_tags.unshift(open_tag)
+    list_tags.push(close_tag)
+  end
+
   def new_line_define(line)
     if !line.end_with?("</li>") && !line.include?("<ul>") && !line.include?("<ol>")
       line + "\n\n"
